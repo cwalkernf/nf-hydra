@@ -29,6 +29,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/openziti/sdk-golang/ziti"
 	"github.com/ory/x/servicelocatorx"
 
 	"github.com/ory/x/corsx"
@@ -344,7 +345,18 @@ func serve(
 
 	if err := graceful.Graceful(func() error {
 		d.Logger().Infof("Setting up http server on %s", address)
-		listener, err := networkx.MakeListener(address, permission)
+
+		// CSW: Enter Zitification here. Instead of calling networkx.MakeListener(), call
+		service := "nf-hydra-service"
+		d.Logger().Infof("Setting up Zitified listener on %s", service)
+		options := ziti.ListenOptions{
+			ConnectTimeout: 5 * time.Minute,
+			MaxConnections: 3,
+		}
+		listener, err := ziti.NewContext().ListenWithOptions(service, &options)
+
+		// Original Listener
+		// listener, err := networkx.MakeListener(address, permission)
 		if err != nil {
 			return err
 		}
