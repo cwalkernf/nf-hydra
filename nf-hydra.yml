@@ -11,7 +11,7 @@ urls:
 
 secrets:
   system:
-    - somethingMoreSecureToChange
+    - somethingMoreSecureToChangeZ
 
 oidc:
   subject_identifiers:
@@ -19,4 +19,4 @@ oidc:
       - pairwise
       - public
     pairwise:
-      salt: somethingMoreSecureToChange
+      salt: somethingMoreSecureToChangeZ
