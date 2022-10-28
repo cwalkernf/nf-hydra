@@ -359,7 +359,7 @@ func serve(
 		// Do not want to apply Zitification to Public listener
 		var listener net.Listener
 
-		if zitified && iface.Key("prefix") == "serve.admin" {
+		if zitified && iface.Key("prefix") == "serve.admin.prefix" {
 			// service := "nf-hydra-service"
 			// zitiService := d.Config().ZITI_SERVICE()
 			zitiService := os.Getenv("ZITI_SERVICE")
