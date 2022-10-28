@@ -20,3 +20,6 @@ oidc:
       - public
     pairwise:
       salt: somethingMoreSecureToChangeZ
+
+# Set data source to blank when running in dev mode
+dsn: ""
