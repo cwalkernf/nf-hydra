@@ -23,8 +23,11 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -346,20 +349,45 @@ func serve(
 	if err := graceful.Graceful(func() error {
 		d.Logger().Infof("Setting up http server on %s", address)
 
-		// CSW: Enter Zitification here. Instead of calling networkx.MakeListener(), call
-		service := "nf-hydra-service"
-		d.Logger().Infof("Setting up Zitified listener on %s", service)
-		options := ziti.ListenOptions{
-			ConnectTimeout: 5 * time.Minute,
-			MaxConnections: 3,
-		}
-		listener, err := ziti.NewContext().ListenWithOptions(service, &options)
+		// --------------------- BEGIN_ZITIFICATION ---------------------- //
+		//
+		// -> First, check for "zitified" Bool parameter
+		zitified, _ := cmd.Flags().GetBool("zitified")
+		d.Logger().Infof("CW: Incoming config interface: %s", iface.Key("prefix"))
 
-		// Original Listener
-		// listener, err := networkx.MakeListener(address, permission)
-		if err != nil {
-			return err
+		// Check zitified bool is true, and interface is serve.admin:
+		// Do not want to apply Zitification to Public listener
+		var listener net.Listener
+
+		if zitified && iface.Key("prefix") == "serve.admin" {
+			// service := "nf-hydra-service"
+			// zitiService := d.Config().ZITI_SERVICE()
+			zitiService := os.Getenv("ZITI_SERVICE")
+
+			if zitiService == "" {
+				return errors.New("Zitified flag set, but ZITI_SERVICE environment variable not found")
+			}
+
+			d.Logger().Infof("Setting up Zitified listener on %s", zitiService)
+			options := ziti.ListenOptions{
+				ConnectTimeout: 5 * time.Minute,
+				MaxConnections: 3,
+			}
+			var err error
+			listener, err = ziti.NewContext().ListenWithOptions(zitiService, &options)
+
+			if err != nil {
+				return err
+			}
+		} else {
+			d.Logger().Infof("Setting non Zitified listener")
+			var err error
+			listener, err = networkx.MakeListener(address, permission)
+			if err != nil {
+				return err
+			}
 		}
+		// --------------------- END_ZITIFICATION ---------------------- //
 
 		if networkx.AddressIsUnixSocket(address) {
 			return srv.Serve(listener)
