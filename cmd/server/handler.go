@@ -353,13 +353,19 @@ func serve(
 		//
 		// -> First, check for "zitified" Bool parameter
 		zitified, _ := cmd.Flags().GetBool("zitified")
-		d.Logger().Infof("CW: Incoming config interface: %s", iface.Key("prefix"))
+
+		// iface := "serve.admin.prefix audience=application service_name=Ory Hydra service_version=master"
+		// iface_prefix := strings.Split(iface, " ")
+		// fmt.Println(iface_prefix[0])
+		iface_string := iface.Key("prefix")
+		iface_type := strings.Split(iface_string, " ")[0]
+		d.Logger().Infof("CW: Incoming config interface type is: %s", iface_type)
 
 		// Check zitified bool is true, and interface is serve.admin:
 		// Do not want to apply Zitification to Public listener
 		var listener net.Listener
 
-		if zitified && iface.Key("prefix") == "serve.admin.prefix" {
+		if zitified && iface_type == "serve.admin.prefix" {
 			// service := "nf-hydra-service"
 			// zitiService := d.Config().ZITI_SERVICE()
 			zitiService := os.Getenv("ZITI_SERVICE")
