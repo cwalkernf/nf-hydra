@@ -1,0 +1,25 @@
+serve:
+  cookies:
+    same_site_mode: Lax
+
+urls:
+  self:
+    issuer: http://ec2-3-215-7-25.compute-1.amazonaws.com:4444
+  consent: http://ec2-3-215-7-25.compute-1.amazonaws.com:3000/consent
+  login: http://ec2-3-215-7-25.compute-1.amazonaws.com:3000/login
+  logout: http://ec2-3-215-7-25.compute-1.amazonaws.com:3000/logout
+
+secrets:
+  system:
+    - somethingMoreSecureToChangeZ
+
+oidc:
+  subject_identifiers:
+    supported_types:
+      - pairwise
+      - public
+    pairwise:
+      salt: somethingMoreSecureToChangeZ
+
+# Set data source to blank when running in dev mode
+dsn: ""

@@ -44,6 +44,8 @@ All sub-commands share command line flags and configuration options.
 	configx.RegisterFlags(cmd.PersistentFlags())
 	cmd.PersistentFlags().Bool("dev", false, "Disables critical security checks to improve local development experience. Do not use in production.")
 	cmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
+	// CSW - Add new flag to enable Zitified admin listener
+	cmd.PersistentFlags().Bool("zitified", false, "This will start the admin listener using a zitified connection. Requires 'serviceName', and 'jsonFile' to work")
 
 	return cmd
 }
